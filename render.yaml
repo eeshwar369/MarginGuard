@@ -5,6 +5,18 @@ services:
     plan: free
     region: ohio
     numInstances: 1
+    autoDeployTrigger: checksPass
+    buildFilter:
+      ignoredPaths:
+        - README.md
+        - docs/**
+        - scripts/**
+        - tests/**
+        - web/tests/**
+        - web/check-accessibility.cjs
+        - web/record-demo.cjs
+        - .env.example
+        - render.yaml
     healthCheckPath: /api/health
     dockerfilePath: ./Dockerfile
     envVars:

@@ -1,0 +1,18 @@
+{
+  "url": "https://marginguard-genztech.onrender.com",
+  "checked_on": "2026-10-02",
+  "screens": [
+    {
+      "screen": "landing",
+      "violations": []
+    },
+    {
+      "screen": "overview",
+      "violations": []
+    },
+    {
+      "screen": "decision-lab",
+      "violations": []
+    }
+  ]
+}

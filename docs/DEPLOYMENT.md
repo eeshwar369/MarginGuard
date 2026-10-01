@@ -13,11 +13,17 @@ The app is packaged as a single service. **Render Free + Neon Free PostgreSQL** 
 
 For frontend development, run the API on port 8000 and `npm run dev` in `web`. Set the app origin to `http://127.0.0.1:3000`. The development proxy keeps cookies and API requests on the same browser origin.
 
-## Free Render + Neon deployment
+## Current deployment
+
+Public URL: **https://marginguard-genztech.onrender.com**. The service uses the Free plan, one Docker instance in Ohio, and external Neon PostgreSQL. Provider credentials are private Render environment variables. GitHub checks gate automatic deploys. The application reads its assigned HTTPS origin from Render.
+
+The public service passed all three browser journeys, a real Gemini 3.5 Flash-Lite investigation, and a persistence check after replacing the app service while retaining Neon. See [verification evidence](VERIFICATION.md). Documentation and test-only changes are excluded from automatic deployment by the Blueprint build filter.
+
+## Reproducing the free Render + Neon deployment
 
 The included `render.yaml` selects **Render Free**, with no paid disk. A separate Neon PostgreSQL database supplies durable storage. Stay on each provider's Free plan. No paid resource is required by this blueprint. See [Render Free limitations](https://render.com/docs/free), [Neon plans](https://neon.com/pricing), and [the Blueprint specification](https://render.com/docs/blueprint-spec).
 
-1. Sign in to [Neon](https://console.neon.tech/signup). Create a **Free** project named `marginguard`; select Singapore if offered to match the Render region. No extra auth or object-storage product is needed.
+1. Sign in to [Neon](https://console.neon.tech/signup). Create a **Free** project named `marginguard`; select Ohio (AWS us-east-2) to match the Render region. No extra auth or object-storage product is needed.
 2. In Neon, click **Connect**, enable connection pooling, and copy the PostgreSQL connection string. Keep its password and `sslmode=require` (or stricter) query parameter intact. This string is a secret, not a public database URL to share in the submission.
 3. Open [Deploy MarginGuard on Render](https://render.com/deploy?repo=https://github.com/eeshwar369/MarginGuard). Connect the supplied GitHub repository, use the root `render.yaml`, and confirm the service plan is **Free** with no disk or paid add-on.
 4. Paste the Neon string into **`MG_DATABASE_URL`** and a Gemini key into **`MG_GEMINI_API_KEY`**, then deploy. If using deterministic mode initially, omit the Gemini variable and add it later in **Environment**. Never commit either secret or include them in the presentation.
@@ -32,7 +38,7 @@ The local SQLite database is not automatically copied into Neon. A fresh cloud d
 
 ## Gemini key
 
-Open [Google AI Studio API keys](https://aistudio.google.com/apikey), sign in, and choose **Create API key** in a new or existing project. Set it as `MG_GEMINI_API_KEY` in Render's **Environment** page and deploy the environment change. The configured `gemini-3.8-flash` has a free usage tier with rate limits, not unlimited requests. Check [Google's pricing](https://ai.google.dev/gemini-api/docs/pricing) and the project's tier before enabling billing. Free-tier content can be used to improve Google's products; use synthetic data for the public demo.
+Open [Google AI Studio API keys](https://aistudio.google.com/apikey), sign in, and choose **Create API key** in a new or existing project. Set it as `MG_GEMINI_API_KEY` in Render's **Environment** page and deploy the environment change. The configured `gemini-3.5-flash-lite` has a free usage tier with rate limits, not unlimited requests. Check [Google's pricing](https://ai.google.dev/gemini-api/docs/pricing) and the project's tier before enabling billing. Free-tier content can be used to improve Google's products; use synthetic data for the public demo.
 
 TLS termination and network perimeter are hosting responsibilities. Terminate HTTPS before the application and restrict direct backend exposure. If adding a CDN/reverse proxy, configure its body-size limit to 25 MB and rate limits for authentication and demo creation. Verify client-IP forwarding for the chosen platform.
 

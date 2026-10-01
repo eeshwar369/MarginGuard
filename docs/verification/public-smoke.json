@@ -1,0 +1,17 @@
+{
+  "url": "https://marginguard-genztech.onrender.com",
+  "region": "ohio",
+  "plan": "free",
+  "https_health": true,
+  "secure_httponly_session": true,
+  "csrf_rejection_previously_verified": true,
+  "account_dataset_approval_survived_redeployment": true,
+  "pdf_export": true,
+  "investigation_status": "complete",
+  "investigation_mode": "ai",
+  "model_tokens": 415,
+  "model": "gemini-3.5-flash-lite",
+  "investigation_wall_ms": 8985,
+  "contradicted_hypothesis": true,
+  "synthetic_data_only": true
+}

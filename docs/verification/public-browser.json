@@ -1,0 +1,13 @@
+{
+  "url": "https://marginguard-genztech.onrender.com",
+  "deployed_commit": "669cf76",
+  "planning_mode": "deterministic; separate live AI smoke check",
+  "stats": {
+    "startTime": "2026-10-01T20:00:34.424Z",
+    "duration": 41618.196,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

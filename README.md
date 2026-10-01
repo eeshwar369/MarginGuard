@@ -6,6 +6,10 @@ Built by **Genztech** for **PS-04: AI Decision Engine for Business Data**. Team 
 
 MarginGuard is a working single-instance product for a small retail operator who needs to explain contribution-margin erosion and compare possible actions. It turns orders, refunds, and fulfilment costs into an inspectable ledger, evidence-linked investigations, sensitivity analyses, and versioned decision memos.
 
+**[Open the live product](https://marginguard-genztech.onrender.com)** · [Source repository](https://github.com/eeshwar369/MarginGuard)
+
+The public service runs on Render Free with durable Neon PostgreSQL storage. It can take around a minute to wake after inactivity.
+
 ![MarginGuard workspace](docs/images/overview.png)
 
 ## Deploy with free persistent storage
@@ -27,7 +31,7 @@ uv run uvicorn app.main:app --host 127.0.0.1 --port 8000
 
 Open **http://127.0.0.1:8000** and choose **Explore the live workspace**. The default development configuration allows this origin. Every visitor receives a separate demo account with clearly labeled synthetic data. No external AI key is needed to inspect and test the deterministic product flows.
 
-For AI planning, copy `.env.example` to `.env`, set `MG_GEMINI_API_KEY` locally, and restart the service. Consent is required before sending a question and numerical summaries to Gemini. Without a key, the interface explicitly identifies verified deterministic analysis. A live AI-provider call has not been verified in this workspace.
+For AI planning, copy `.env.example` to `.env`, set `MG_GEMINI_API_KEY` locally, and restart the service. Consent is required before sending a question and numerical summaries to Gemini. Without a key, the interface explicitly identifies verified deterministic analysis. A real Gemini 3.5 Flash-Lite investigation completed on the public service, recorded 415 model tokens, and correctly contradicted the sample discount hypothesis. All three browser journeys also passed against the public deployment. See the [verification record](docs/VERIFICATION.md).
 
 ## What is implemented
 
@@ -77,6 +81,6 @@ The browser tests expect a running app at port 8000. On Windows, `MG_BROWSER_PAT
 | Reports | ReportLab | Downloadable decision PDF |
 | Verification | pytest, Playwright, Ruff, TypeScript | Financial, security, workflow, and browser checks |
 
-Read the [architecture](docs/ARCHITECTURE.md), [deployment guide](docs/DEPLOYMENT.md), and [CSV contract](docs/CSV_CONTRACT.md). The Dockerfile, Compose file, Render blueprint, and backup utility are included. Public deployment still requires the account-owned Neon connection string and Render setup. Use one application process; cloud state belongs in PostgreSQL, and local SQLite requires a persistent volume. Horizontal scaling, SSO, separate approver roles, password reset, and external store connectors are outside this release.
+Read the [architecture](docs/ARCHITECTURE.md), [deployment guide](docs/DEPLOYMENT.md), and [CSV contract](docs/CSV_CONTRACT.md). The Dockerfile, Compose file, Render blueprint, and backup utility are included. The public Render service is deployed with Neon PostgreSQL and private provider credentials. Use one application process; cloud state belongs in PostgreSQL, and local SQLite requires a persistent volume. Horizontal scaling, SSO, separate approver roles, password reset, and external store connectors are outside this release.
 
 The final project presentation and demo materials are prepared separately in the workspace's `deliverables` directory. The submission must include this repository, the actual deployed Render URL, and an accessible demo-video URL after their access checks.
