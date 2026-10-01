@@ -1,0 +1,13 @@
+{
+  "target": "512 MB Linux container, PostgreSQL 17",
+  "browser": "Installed Chrome",
+  "stats": {
+    "startTime": "2026-10-01T19:16:00.630Z",
+    "duration": 26126.061,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "public_hosting_tested": false
+}

@@ -4,15 +4,15 @@ Local execution on Windows 11, Python 3.12.11, installed Chrome, Node 20.20.2. D
 
 | Check | Observed result |
 |---|---|
-| Backend pytest suite | 49 passed |
-| Real Chrome browser journeys | 3 passed |
+| Backend pytest suite | 54 passed on SQLite; the same 54 passed on PostgreSQL 17 |
+| Real Chrome browser journeys | 3 passed locally, then 3 passed against the PostgreSQL-backed Linux container |
 | Next.js production export and TypeScript compilation | Passed |
 | npm installation audit | 0 reported vulnerabilities |
 | Python Ruff checks | Passed |
 | Automated accessibility scan | No WCAG A/AA violations detected on landing, overview, and decision lab after contrast fixes |
 | Deployed public service | Not deployed or tested |
 | Real Gemini model call | Not tested; no API key configured |
-| Docker runtime build | Not tested; local daemon unavailable |
+| Docker runtime build | Passed; 512 MB container passed the browser journeys and restart-persistence check |
 
 Backend coverage includes exact money parsing, repeated refunds, partial-refund join correctness, row-order invariance, missing and orphan costs, excessive refunds, date conflicts, source evidence, literal SQL-safe search, unsupported currency, numeric bounds, formula-safe exports, one-period uncertainty, scenario reference arithmetic, break-even, whole orders, negative unit contribution, recommendation changes, account isolation, CSRF/origin checks, authentication, approval concurrency, immutable history, corrections, checkpoint resume, streamed body limits, production security headers, typed AI-plan success with a test double, and explicit fallback under an injected provider outage.
 
@@ -35,3 +35,5 @@ Raw local outputs are in `artifacts/test-results.xml`, `artifacts/benchmark.json
 ## Free persistent-storage update ? 2 October 2026
 
 The same expanded **54-test suite passed against SQLite and PostgreSQL 17** (19.39 s and 170.15 s respectively; the PostgreSQL run overlapped a container build, so these are not comparative database benchmarks). PostgreSQL ran in a localhost-only Docker container, with an isolated schema per test. Added checks cover durable commits after reconnect, transaction rollback, concurrent rate-limit enforcement, literal parameter binding, timestamp precision, Render origin configuration, and mandatory TLS for production database URLs. Full records are in `docs/verification/sqlite-tests.xml` and `postgres-tests.xml`. Neon-specific networking, credentials, quotas, and the public Render deployment still require live account setup.
+
+The Linux deployment image built with Node 22 and Python 3.12.14. A container limited to 512 MB passed all three existing Chrome journeys against PostgreSQL (26.1 s). After creating a registered account, loading a dataset, and approving a memo, the application container was restarted: the session, account, dataset hash, and approved memo remained unchanged; PDF export still worked. `docs/verification/container-restart.json` records those checks. Observed memory after the browser suite was 108.2 MiB, not a peak-memory or concurrent-load benchmark. These checks used local PostgreSQL over a private test connection; they do not establish live Neon/Render availability.

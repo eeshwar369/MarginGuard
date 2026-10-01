@@ -1,0 +1,10 @@
+{
+  "container_memory_limit_mb": 512,
+  "database": "PostgreSQL 17",
+  "registered_account_survived": true,
+  "existing_session_survived": true,
+  "dataset_hash_unchanged": true,
+  "approved_memo_unchanged": true,
+  "pdf_export_after_restart": true,
+  "public_hosting_tested": false
+}

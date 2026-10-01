@@ -190,7 +190,9 @@ try {
     $link=Text $s 'linkedin.com/in/eeshwar369/' 533 391 356 26 14 'A3C58C'
     $link.ActionSettings.Item(1).Hyperlink.Address='https://www.linkedin.com/in/eeshwar369/'
     $null=Text $s 'PS-04 / AI Decision Engine for Business Data' 533 431 355 18 10 '7F9F6C'
-    Note $s 'Final demonstration prompts: challenge a false discount hypothesis, inspect source evidence, increase return-cost uncertainty, approve a memo, correct a cost, and observe stale approval. The working product, reproducible source, local test evidence, deployment files, presentation, and narrated actual browser demo are prepared. Public GitHub repository, deployed service, and hosted demo URLs still require account access and verification. This deck contains exactly ten slides. Team identity and LinkedIn are user-provided.'
+    $repoLink=Text $s 'github.com/eeshwar369/MarginGuard' 53 483 858 20 11 'A3C58C'
+    $repoLink.ActionSettings.Item(1).Hyperlink.Address='https://github.com/eeshwar369/MarginGuard'
+    Note $s 'Final demonstration prompts: challenge a false discount hypothesis, inspect source evidence, increase return-cost uncertainty, approve a memo, correct a cost, and observe stale approval. The working product, reproducible source, local test evidence, deployment files, presentation, and narrated actual browser demo are prepared. The source is published at https://github.com/eeshwar369/MarginGuard. The deployed service and hosted demo URLs still require account access and verification. This deck contains exactly ten slides. Team identity and LinkedIn are user-provided.'
 
     $pptx=Join-Path $deliverables 'MarginGuard_Final_Project.pptx'
     $pdf=Join-Path $deliverables 'MarginGuard_Final_Project.pdf'
