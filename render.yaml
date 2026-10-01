@@ -1,9 +1,9 @@
 services:
   - type: web
-    name: marginguard
+    name: marginguard-genztech
     runtime: docker
     plan: free
-    region: singapore
+    region: ohio
     numInstances: 1
     healthCheckPath: /api/health
     dockerfilePath: ./Dockerfile
@@ -17,7 +17,7 @@ services:
       - key: MG_GEMINI_API_KEY
         sync: false
       - key: MG_GEMINI_MODEL
-        value: gemini-3.8-flash
+        value: gemini-3.5-flash-lite
       - key: MG_ALLOW_REGISTRATION
         value: "true"
       - key: MG_ALLOW_DEMO

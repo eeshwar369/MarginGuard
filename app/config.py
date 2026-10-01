@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     max_upload_mb: int = Field(8, ge=1, le=50)
     max_rows: int = Field(50000, ge=100, le=200000)
     gemini_api_key: str = ""
-    gemini_model: str = "gemini-3.8-flash"
+    gemini_model: str = "gemini-3.5-flash-lite"
     ai_timeout_seconds: int = Field(35, ge=5, le=90)
 
     @model_validator(mode="after")

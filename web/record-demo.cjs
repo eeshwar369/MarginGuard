@@ -10,7 +10,7 @@ async function main() {
   const page = await context.newPage();
   const started = performance.now();
   const timings = [];
-  await page.goto('http://127.0.0.1:8000');
+  await page.goto(process.env.MG_TEST_URL || 'http://127.0.0.1:8000');
   async function segment(id,action) {
     const s = segments.find(x=>x.id===id);
     await page.evaluate(caption=>{
@@ -32,7 +32,10 @@ async function main() {
   await page.locator('.evidence-table tbody tr').first().waitFor();
   await segment('evidence',async()=>{await page.waitForTimeout(7000);await page.locator('.modal .trace summary').click();await page.locator('.modal .trace').scrollIntoViewIfNeeded();});
   await page.getByRole('button',{name:'Close dialog'}).click();await nav('Investigations');
-  await page.getByLabel('Business question').fill('Did discounts decrease?');await page.getByRole('button',{name:'Run investigation'}).click();
+  await page.getByLabel('Business question').fill('Did discounts decrease?');
+  const aiToggle=page.getByRole('checkbox',{name:'Use AI to choose analyses'});
+  if(await aiToggle.isVisible())await aiToggle.uncheck();
+  await page.getByRole('button',{name:'Run investigation'}).click();
   await page.getByText('Hypothesis: discount decreased · contradicted').waitFor();
   await segment('investigation',async()=>{await page.waitForTimeout(8000);await page.locator('.investigation-result .trace summary').click();await page.locator('.investigation-result').scrollIntoViewIfNeeded();});
   await nav('Decision lab');await page.getByRole('heading',{name:'Reduce shipping cost',exact:true}).waitFor();

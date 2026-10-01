@@ -5,7 +5,7 @@ async function main(){
  const browser=await chromium.launch({executablePath:process.env.MG_BROWSER_PATH});
  const context=await browser.newContext({viewport:{width:1440,height:1050}});
  const page=await context.newPage();
- await page.goto('http://127.0.0.1:8000');
+ await page.goto(process.env.MG_TEST_URL || 'http://127.0.0.1:8000');
  const results=[];
  async function check(name){
    const r=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();

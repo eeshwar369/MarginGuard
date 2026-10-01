@@ -34,6 +34,11 @@ test('judge journey: evidence, counterfactual, approval, correction, stale recor
     .getByRole('button', { name: 'Investigations', exact: true })
     .click();
   await page.getByLabel('Business question').fill('Did discounts decrease?');
+  const aiToggle = page.getByRole('checkbox', { name: 'Use AI to choose analyses' });
+  if (await aiToggle.isVisible()) {
+    await expect(page.getByRole('button', { name: 'Run investigation' })).toBeDisabled();
+    await aiToggle.uncheck();
+  }
   await page.getByRole('button', { name: 'Run investigation' }).click();
   await expect(page.getByText('Hypothesis: discount decreased · contradicted')).toBeVisible();
   await expect(page.getByText('complete', { exact: true })).toBeVisible();
