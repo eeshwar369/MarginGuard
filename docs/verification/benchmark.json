@@ -1,0 +1,46 @@
+{
+  "environment": "Windows-11-10.0.26200-SP0",
+  "python": "3.12.11",
+  "method": "Three sequential parse + validation + DuckDB analysis runs, synthetic records, no HTTP/model call.",
+  "measurements": [
+    {
+      "order_lines": 616,
+      "cost_lines": 616,
+      "refund_lines": 0,
+      "import_and_analysis_ms": [
+        103.3,
+        99.7,
+        125.3
+      ],
+      "median_ms": 103.3,
+      "input_bytes": 57943,
+      "reconciliation_residual": 0
+    },
+    {
+      "order_lines": 10000,
+      "cost_lines": 10000,
+      "refund_lines": 0,
+      "import_and_analysis_ms": [
+        506.9,
+        661.4,
+        541.6
+      ],
+      "median_ms": 541.6,
+      "input_bytes": 970188,
+      "reconciliation_residual": 0
+    },
+    {
+      "order_lines": 50000,
+      "cost_lines": 50000,
+      "refund_lines": 0,
+      "import_and_analysis_ms": [
+        2225.1,
+        2371.8,
+        1619.9
+      ],
+      "median_ms": 2225.1,
+      "input_bytes": 4983974,
+      "reconciliation_residual": 0
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: marginguard
+    runtime: docker
+    plan: 1c-2g
+    region: singapore
+    numInstances: 1
+    healthCheckPath: /api/health
+    dockerfilePath: ./Dockerfile
+    disk:
+      name: marginguard-data
+      mountPath: /var/lib/marginguard
+      sizeGB: 1
+    envVars:
+      - key: MG_ENV
+        value: production
+      - key: MG_COOKIE_SECURE
+        value: "true"
+      - key: MG_APP_ORIGIN
+        sync: false
+      - key: MG_GEMINI_API_KEY
+        sync: false
+      - key: MG_GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: MG_ALLOW_REGISTRATION
+        value: "true"
+      - key: MG_ALLOW_DEMO
+        value: "true"

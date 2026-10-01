@@ -1,0 +1,18 @@
+services:
+  marginguard:
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      MG_ENV: development
+      MG_APP_ORIGIN: http://127.0.0.1:8000
+      MG_COOKIE_SECURE: "false"
+      MG_GEMINI_API_KEY: ${MG_GEMINI_API_KEY:-}
+      MG_GEMINI_MODEL: ${MG_GEMINI_MODEL:-gemini-2.5-flash}
+    volumes:
+      - marginguard-data:/var/lib/marginguard
+    restart: unless-stopped
+    mem_limit: 1g
+    cpus: 2
+volumes:
+  marginguard-data:

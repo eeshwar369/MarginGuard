@@ -1,0 +1,30 @@
+{
+  "name": "marginguard-web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1",
+    "build": "next build",
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "playwright test",
+    "format": "prettier --write src tests playwright.config.ts next.config.ts",
+    "format:check": "prettier --check src tests playwright.config.ts next.config.ts"
+  },
+  "dependencies": {
+    "@fontsource/dm-sans": "5.3.0",
+    "lucide-react": "1.49.0",
+    "next": "16.3.8",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "recharts": "3.10.1"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "1.63.0",
+    "@types/node": "26.6.3",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "prettier": "3.9.9",
+    "typescript": "7.0.2"
+  }
+}
