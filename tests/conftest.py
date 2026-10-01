@@ -1,13 +1,47 @@
+import os
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
+from uuid import uuid4
+
+import psycopg
 import pytest
 from fastapi.testclient import TestClient
 
 from app.config import settings
 from app.data import csv_bytes
+from app.db import close_pool
 
 
 @pytest.fixture
-def client(tmp_path, monkeypatch):
+def database(tmp_path, monkeypatch):
+    """Use a fresh SQLite file or an isolated schema in an explicit test server."""
+    close_pool()
     monkeypatch.setenv("MG_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("MG_DATABASE_URL", "")
+    monkeypatch.delenv("RENDER", raising=False)
+    test_url = os.getenv("MG_TEST_DATABASE_URL", "")
+    schema = "mg_test_" + uuid4().hex
+    if test_url:
+        with psycopg.connect(test_url, autocommit=True) as admin:
+            admin.execute(psycopg.sql.SQL("CREATE SCHEMA {}").format(psycopg.sql.Identifier(schema)))
+        parts = urlsplit(test_url)
+        query = dict(parse_qsl(parts.query))
+        query["options"] = "-csearch_path=" + schema
+        monkeypatch.setenv("MG_DATABASE_URL", urlunsplit(parts._replace(query=urlencode(query))))
+    settings.cache_clear()
+    try:
+        yield
+    finally:
+        close_pool()
+        settings.cache_clear()
+        if test_url:
+            with psycopg.connect(test_url, autocommit=True) as admin:
+                admin.execute(
+                    psycopg.sql.SQL("DROP SCHEMA {} CASCADE").format(psycopg.sql.Identifier(schema))
+                )
+
+
+@pytest.fixture
+def client(database, monkeypatch):
     monkeypatch.setenv("MG_GEMINI_API_KEY", "")
     monkeypatch.setenv("MG_COOKIE_SECURE", "false")
     monkeypatch.setenv("MG_ENV", "development")

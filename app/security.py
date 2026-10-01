@@ -6,7 +6,7 @@ import time
 from fastapi import HTTPException, Request, Response
 
 from .config import settings
-from .db import connect
+from .db import begin_write, connect
 
 COOKIE = "mg_session"
 
@@ -75,7 +75,7 @@ def current_user(request: Request) -> dict:
 def rate_limit(bucket: str, limit: int, seconds: int):
     timestamp = time.time()
     with connect() as c:
-        c.execute("BEGIN IMMEDIATE")
+        begin_write(c)
         c.execute("DELETE FROM rate_limits WHERE reset_at<?", (timestamp,))
         row = c.execute("SELECT * FROM rate_limits WHERE bucket=?", (bucket,)).fetchone()
         if row and row["count"] >= limit:
@@ -86,6 +86,6 @@ def rate_limit(bucket: str, limit: int, seconds: int):
             )
         c.execute(
             """INSERT INTO rate_limits VALUES(?,1,?) ON CONFLICT(bucket)
-                    DO UPDATE SET count=count+1""",
+                    DO UPDATE SET count=rate_limits.count+1""",
             (bucket, timestamp + seconds),
         )

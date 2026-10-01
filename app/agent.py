@@ -8,7 +8,7 @@ from langgraph.graph import END, START, StateGraph
 from pydantic import BaseModel, Field
 
 from .config import settings
-from .db import audit, connect, encode, now
+from .db import audit, begin_write, connect, encode, now
 
 logger = logging.getLogger("marginguard.agent")
 
@@ -257,7 +257,7 @@ def graph():
 def execute_run(run_id: str):
     start = time.monotonic()
     with connect() as c:
-        c.execute("BEGIN IMMEDIATE")
+        begin_write(c)
         row = c.execute("SELECT * FROM runs WHERE id=?", (run_id,)).fetchone()
         if not row or row["status"] not in {"queued", "interrupted"}:
             return

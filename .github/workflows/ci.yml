@@ -8,6 +8,18 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: mg_test
+          POSTGRES_PASSWORD: local-test-only
+          POSTGRES_DB: marginguard_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U mg_test -d marginguard_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
@@ -22,6 +34,10 @@ jobs:
       - run: uv sync --frozen
       - run: uv run ruff check app tests scripts
       - run: uv run pytest -q --junitxml=artifacts/test-results.xml
+      - name: Repeat backend contracts against PostgreSQL
+        run: uv run pytest -q --junitxml=artifacts/postgres-tests.xml
+        env:
+          MG_TEST_DATABASE_URL: postgresql://mg_test:local-test-only@127.0.0.1:5432/marginguard_test
       - run: npm ci && npm run build
         working-directory: web
       - run: npx playwright install --with-deps chromium
@@ -38,6 +54,7 @@ jobs:
           node check-accessibility.cjs
         env:
           MG_APP_ORIGIN: http://127.0.0.1:8000
+          MG_DATABASE_URL: postgresql://mg_test:local-test-only@127.0.0.1:5432/marginguard_test
       - uses: actions/upload-artifact@v4
         if: always()
         with:

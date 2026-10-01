@@ -8,6 +8,12 @@ MarginGuard is a working single-instance product for a small retail operator who
 
 ![MarginGuard workspace](docs/images/overview.png)
 
+## Deploy with free persistent storage
+
+[Deploy on Render](https://render.com/deploy?repo=https://github.com/eeshwar369/MarginGuard) using the included Free blueprint and a separate [Neon Free PostgreSQL](https://console.neon.tech/signup) database. Set the private Neon connection string as `MG_DATABASE_URL` and the optional Gemini key as `MG_GEMINI_API_KEY` in Render. The app automatically uses its assigned HTTPS origin.
+
+Accounts, datasets, checkpoints, and decisions stay in PostgreSQL across Render restarts. Free services have cold starts and usage quotas; this is not unlimited or always-on hosting. Follow the [deployment guide](docs/DEPLOYMENT.md) for setup and the persistence check. Local development defaults to SQLite when no database URL is set.
+
 ## Try it locally
 
 ```sh
@@ -67,10 +73,10 @@ The browser tests expect a running app at port 8000. On Windows, `MG_BROWSER_PAT
 | Analytics | DuckDB, integer paise | Reconciliation and exact accounting attribution |
 | Investigation | LangGraph, optional Google Gemini | Bounded planning with durable stage checkpoints |
 | Scenarios | Python Decimal | Whole-order sensitivity and downside comparisons |
-| Persistence | SQLite WAL on durable disk | Accounts, snapshots, runs, memos, audit |
+| Persistence | PostgreSQL in the cloud; SQLite WAL locally | Accounts, snapshots, runs, memos, audit |
 | Reports | ReportLab | Downloadable decision PDF |
 | Verification | pytest, Playwright, Ruff, TypeScript | Financial, security, workflow, and browser checks |
 
-Read the [architecture](docs/ARCHITECTURE.md), [deployment guide](docs/DEPLOYMENT.md), and [CSV contract](docs/CSV_CONTRACT.md). The Dockerfile, Compose file, Render blueprint, and backup utility are included. Deployment has not been performed; the local Docker daemon was unavailable. Use one application process and a persistent volume. Horizontal scaling, SSO, separate approver roles, password reset, and external store connectors are outside this release.
+Read the [architecture](docs/ARCHITECTURE.md), [deployment guide](docs/DEPLOYMENT.md), and [CSV contract](docs/CSV_CONTRACT.md). The Dockerfile, Compose file, Render blueprint, and backup utility are included. Public deployment still requires the account-owned Neon connection string and Render setup. Use one application process; cloud state belongs in PostgreSQL, and local SQLite requires a persistent volume. Horizontal scaling, SSO, separate approver roles, password reset, and external store connectors are outside this release.
 
-The final project presentation and demo materials are prepared separately in the workspace's `deliverables` directory. Public GitHub, deployment, and video URLs must be filled after publishing and access checks; this README does not invent them.
+The final project presentation and demo materials are prepared separately in the workspace's `deliverables` directory. The submission must include this repository, the actual deployed Render URL, and an accessible demo-video URL after their access checks.

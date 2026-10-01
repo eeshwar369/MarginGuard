@@ -13,7 +13,7 @@ flowchart LR
   Gemini[Optional Gemini planner] -. User consent .-> Plan
   Plan --> Checks[Deterministic evidence checks]
   Checks --> Verify[Verify emitted values]
-  Verify --> Checkpoint[SQLite checkpoints + result]
+  Verify --> Checkpoint[Database checkpoints + result]
   Summary --> Scenario[Decimal scenario engine]
   Scenario --> Memo[Versioned decision memo]
   Memo --> Approval[Human approval]
@@ -29,7 +29,7 @@ Each upload contains the three documented CSV schemas. Missing joins, conflictin
 
 ## Investigation behavior
 
-The graph has four actual execution stages: validate, plan, investigate, verify. SQLite stores a checkpoint after every completed stage. An interrupted run restarts the graph, skips completed stages, and uses its original frozen dataset. This is a custom durable checkpoint layer around LangGraph, not a claim of distributed exactly-once execution. The optional model call may repeat if the process crashes after the provider returns but before the checkpoint commits.
+The graph has four actual execution stages: validate, plan, investigate, verify. The configured database stores a checkpoint after every completed stage. An interrupted run restarts the graph, skips completed stages, and uses its original frozen dataset. This is a custom durable checkpoint layer around LangGraph, not a claim of distributed exactly-once execution. The optional model call may repeat if the process crashes after the provider returns but before the checkpoint commits.
 
 Gemini receives only the question and numerical period summaries after user consent. It selects up to five typed metrics and a claimed direction; it cannot produce SQL, read arbitrary files, change data, approve decisions, or invent displayed financial values. The model output is schema-validated. Evidence and hypothesis status come from stored numerical calculations. AI failure is visibly labeled as deterministic fallback. Without a configured key the UI explicitly says verified analysis. Deterministic question matching is a limited keyword router, not semantic AI.
 
@@ -41,6 +41,6 @@ Data and scenario hashes bind every memo. A transaction compares them again at a
 
 ## Deployment boundary
 
-One FastAPI process serves the exported frontend and API. A two-thread executor processes up to twelve queued/running investigations across the service, one active run per workspace. SQLite WAL stores accounts, sessions, snapshots, results, memos, and audit events on a durable volume. DuckDB is an in-memory per-request analytical engine; it is not the primary datastore. This release is a **single-instance** product. Horizontal deployment needs an external database, distributed job queue/locks, and shared storage first.
+One FastAPI process serves the exported frontend and API. A two-thread executor processes up to twelve queued/running investigations across the service, one active run per workspace. PostgreSQL (Neon on the free Render deployment) stores accounts, sessions, snapshots, results, memos, and audit events. Local development uses SQLite WAL when no `MG_DATABASE_URL` is configured. Critical read/modify/write transactions use a PostgreSQL transaction-scoped advisory lock or SQLite `BEGIN IMMEDIATE`; both serialize the approval/version checks. PostgreSQL uses a bounded five-connection pool, short idle retention, TLS in production, parameter binding, and statement/lock timeouts. The app refuses to start on Render without an external database URL, preventing accidental ephemeral storage. DuckDB is an in-memory per-request analytical engine; it is not the primary datastore. This release is a **single-instance** product. Horizontal deployment still needs a distributed job queue and coordinated restart recovery; adding PostgreSQL alone does not make the in-process investigation executor safe for multiple replicas.
 
 Sessions are HTTP-only cookies; production requires HTTPS and secure cookies. Unsafe requests require the expected origin and an authenticated CSRF token. Passwords are scrypt hashes. Workspace ownership is checked on resource access. Model secrets never enter the frontend bundle. API responses are non-cacheable; production sends CSP and other security headers. Application audit records are append-only through the API, but they are not cryptographically tamper-proof against a database administrator.

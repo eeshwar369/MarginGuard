@@ -3,7 +3,6 @@ import hashlib
 import json
 import logging
 import re
-import sqlite3
 import time
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager
@@ -20,7 +19,19 @@ from .agent import execute_run
 from .analytics import evidence
 from .config import settings
 from .data import SCHEMAS, ImportErrorDetail, csv_bytes, import_exports, validate_snapshot
-from .db import audit, connect, digest, encode, initialize, now, stale_memos, uid
+from .db import (
+    INTEGRITY_ERRORS,
+    audit,
+    begin_write,
+    close_pool,
+    connect,
+    digest,
+    encode,
+    initialize,
+    now,
+    stale_memos,
+    uid,
+)
 from .decisions import simulate
 from .limits import BodyLimitMiddleware
 from .models import (
@@ -51,8 +62,11 @@ async def lifespan(application):
             "DELETE FROM users WHERE is_demo=1 AND created_at<?",
             ((datetime.now(UTC) - timedelta(days=3)).isoformat(),),
         )
-    yield
-    application.state.executor.shutdown(wait=True, cancel_futures=False)
+    try:
+        yield
+    finally:
+        application.state.executor.shutdown(wait=True, cancel_futures=False)
+        close_pool()
 
 
 app = FastAPI(
@@ -179,7 +193,7 @@ def register(body: Registration, request: Request, response: Response):
             )
             csrf = create_session(c, user_id, response)
             audit(c, workspace, "workspace.created", {"name": body.workspace_name})
-    except sqlite3.IntegrityError as e:
+    except INTEGRITY_ERRORS as e:
         raise HTTPException(409, "This account already exists. Please sign in.") from e
     return {
         "id": user_id,
@@ -321,7 +335,7 @@ def template(kind: str):
 @app.post("/api/datasets/{dataset_id}/acknowledge")
 def acknowledge(dataset_id: str, user=Depends(current_user)):
     with connect() as c:
-        c.execute("BEGIN IMMEDIATE")
+        begin_write(c)
         row = dataset_row(c, user["workspace_id"], dataset_id)
         if row["status"] == "blocked":
             raise HTTPException(409, "Errors require a corrected export; they cannot be acknowledged away.")
@@ -338,7 +352,7 @@ def acknowledge(dataset_id: str, user=Depends(current_user)):
 @app.post("/api/datasets/{dataset_id}/activate")
 def activate(dataset_id: str, user=Depends(current_user)):
     with connect() as c:
-        c.execute("BEGIN IMMEDIATE")
+        begin_write(c)
         row = dataset_row(c, user["workspace_id"], dataset_id)
         require_ready(row)
         c.execute(
@@ -440,7 +454,7 @@ def start_investigation(body: InvestigationRequest, request: Request, user=Depen
             400, "Confirm that the question and numerical summaries may be sent to the AI provider."
         )
     with connect() as c:
-        c.execute("BEGIN IMMEDIATE")
+        begin_write(c)
         dataset = dataset_row(c, user["workspace_id"])
         require_ready(dataset)
         count = c.execute(
@@ -491,7 +505,7 @@ def investigation(run_id: str, user=Depends(current_user)):
 def resume(run_id: str, request: Request, user=Depends(current_user)):
     rate_limit("resume:" + user["workspace_id"], 5, 300)
     with connect() as c:
-        c.execute("BEGIN IMMEDIATE")
+        begin_write(c)
         row = c.execute(
             "SELECT * FROM runs WHERE id=? AND workspace_id=?", (run_id, user["workspace_id"])
         ).fetchone()
@@ -532,7 +546,7 @@ def preview_scenario(body: Scenario, user=Depends(current_user)):
 def save_scenario(body: Scenario, user=Depends(current_user)):
     result = preview_scenario(body, user)
     with connect() as c:
-        c.execute("BEGIN IMMEDIATE")
+        begin_write(c)
         active = dataset_row(c, user["workspace_id"])
         if active["id"] != result["dataset_id"]:
             raise HTTPException(409, "Data changed. Recalculate the scenario before saving.")
@@ -571,7 +585,7 @@ def memos(user=Depends(current_user)):
 @app.post("/api/memos")
 def create_memo(user=Depends(current_user)):
     with connect() as c:
-        c.execute("BEGIN IMMEDIATE")
+        begin_write(c)
         row = dataset_row(c, user["workspace_id"])
         require_ready(row)
         ws = c.execute("SELECT * FROM workspaces WHERE id=?", (user["workspace_id"],)).fetchone()
@@ -608,7 +622,7 @@ def approve_memo(memo_id: str, body: Approval, user=Depends(current_user)):
     if not body.acknowledged:
         raise HTTPException(400, "Review and acknowledge the assumptions before approving.")
     with connect() as c:
-        c.execute("BEGIN IMMEDIATE")
+        begin_write(c)
         memo = c.execute(
             "SELECT * FROM memos WHERE id=? AND workspace_id=?", (memo_id, user["workspace_id"])
         ).fetchone()

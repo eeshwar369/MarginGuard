@@ -3,7 +3,7 @@ import json
 from fastapi import HTTPException
 
 from .analytics import analyze
-from .db import audit, connect, digest, encode, now, stale_memos, uid
+from .db import audit, begin_write, connect, digest, encode, now, stale_memos, uid
 
 
 def dataset_row(c, workspace: str, dataset_id: str | None = None):
@@ -48,7 +48,7 @@ def save_dataset(
     summary = {} if blocked else analyze(snapshot)
     dataset_id = uid()
     with connect() as c:
-        c.execute("BEGIN IMMEDIATE")
+        begin_write(c)
         if expected_active_hash is not None:
             active = dataset_row(c, workspace)
             if active["content_hash"] != expected_active_hash:
