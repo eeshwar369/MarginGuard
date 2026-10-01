@@ -17,7 +17,7 @@ services:
       - key: MG_GEMINI_API_KEY
         sync: false
       - key: MG_GEMINI_MODEL
-        value: gemini-2.5-flash
+        value: gemini-3.8-flash
       - key: MG_ALLOW_REGISTRATION
         value: "true"
       - key: MG_ALLOW_DEMO

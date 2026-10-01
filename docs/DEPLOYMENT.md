@@ -32,7 +32,7 @@ The local SQLite database is not automatically copied into Neon. A fresh cloud d
 
 ## Gemini key
 
-Open [Google AI Studio API keys](https://aistudio.google.com/apikey), sign in, and choose **Create API key** in a new or existing project. Set it as `MG_GEMINI_API_KEY` in Render's **Environment** page and deploy the environment change. The configured `gemini-2.5-flash` has a free usage tier with rate limits, not unlimited requests. Check [Google's pricing](https://ai.google.dev/gemini-api/docs/pricing) and the project's tier before enabling billing. Free-tier content can be used to improve Google's products; use synthetic data for the public demo.
+Open [Google AI Studio API keys](https://aistudio.google.com/apikey), sign in, and choose **Create API key** in a new or existing project. Set it as `MG_GEMINI_API_KEY` in Render's **Environment** page and deploy the environment change. The configured `gemini-3.8-flash` has a free usage tier with rate limits, not unlimited requests. Check [Google's pricing](https://ai.google.dev/gemini-api/docs/pricing) and the project's tier before enabling billing. Free-tier content can be used to improve Google's products; use synthetic data for the public demo.
 
 TLS termination and network perimeter are hosting responsibilities. Terminate HTTPS before the application and restrict direct backend exposure. If adding a CDN/reverse proxy, configure its body-size limit to 25 MB and rate limits for authentication and demo creation. Verify client-IP forwarding for the chosen platform.
 

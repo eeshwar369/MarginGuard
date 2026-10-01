@@ -150,8 +150,9 @@ def plan_node(state: GraphState):
                     ),
                     response_mime_type="application/json",
                     response_schema=AnalysisPlan,
-                    temperature=0,
-                    max_output_tokens=1000,
+                    thinking_config=types.ThinkingConfig(thinking_level="low"),
+                    automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
+                    max_output_tokens=2048,
                 ),
             )
             plan = AnalysisPlan.model_validate_json(response.text)
