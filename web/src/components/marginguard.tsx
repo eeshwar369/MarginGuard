@@ -260,33 +260,33 @@ export default function MarginGuard() {
         />
       )}
       <aside className={'sidebar ' + (mobile ? 'open' : '')}>
-        <Brand />
-        <div className="workspace-switch">
-          <div className="workspace-avatar">{workspace?.name.slice(0, 1) ?? 'M'}</div>
-          <div>
-            <strong>{workspace?.name ?? 'Workspace'}</strong>
-            <span>{user.is_demo ? 'Demo workspace' : 'Private workspace'}</span>
+        <div className="sidebar-content">
+          <Brand />
+          <div className="workspace-switch">
+            <div className="workspace-avatar">{workspace?.name.slice(0, 1) ?? 'M'}</div>
+            <div>
+              <strong>{workspace?.name ?? 'Workspace'}</strong>
+              <span>{user.is_demo ? 'Demo workspace' : 'Private workspace'}</span>
+            </div>
+            <ChevronDown size={14} />
           </div>
-          <ChevronDown size={14} />
-        </div>
-        <div className="nav-label">WORKSPACE</div>
-        <nav aria-label="Main navigation">
-          {navigation.map((n) => (
-            <button
-              key={n.name}
-              className={page === n.name ? 'active' : ''}
-              onClick={() => navigate(n.name)}
-              aria-current={page === n.name ? 'page' : undefined}
-            >
-              <n.icon size={18} />
-              {n.name}
-              {n.name === 'Data sources' && dataset?.status !== 'ready' && (
-                <span className="nav-attention" />
-              )}
-            </button>
-          ))}
-        </nav>
-        <div className="sidebar-bottom">
+          <div className="nav-label">WORKSPACE</div>
+          <nav aria-label="Main navigation">
+            {navigation.map((n) => (
+              <button
+                key={n.name}
+                className={page === n.name ? 'active' : ''}
+                onClick={() => navigate(n.name)}
+                aria-current={page === n.name ? 'page' : undefined}
+              >
+                <n.icon size={18} />
+                {n.name}
+                {n.name === 'Data sources' && dataset?.status !== 'ready' && (
+                  <span className="nav-attention" />
+                )}
+              </button>
+            ))}
+          </nav>
           <div className="sidebar-note">
             <ShieldCheck size={20} />
             <strong>Every decision has receipts.</strong>
@@ -296,6 +296,8 @@ export default function MarginGuard() {
               Assumptions you can challenge.
             </p>
           </div>
+        </div>
+        <div className="sidebar-bottom">
           <div className="user-row">
             <div className="user-avatar">
               {user.name
@@ -308,24 +310,25 @@ export default function MarginGuard() {
               <strong>{user.name}</strong>
               <span>{user.is_demo ? 'Guest reviewer' : 'Workspace owner'}</span>
             </div>
-            <button
-              aria-label="Sign out"
-              className="icon-button"
-              onClick={async () => {
-                try {
-                  await api('/auth/logout', 'POST');
-                  setUser(null);
-                  setWorkspace(null);
-                  setCsrf('');
-                  setPage('Overview');
-                } catch (e) {
-                  onError((e as Error).message);
-                }
-              }}
-            >
-              <LogOut size={17} />
-            </button>
           </div>
+          <button
+            aria-label="Sign out"
+            className="sidebar-signout"
+            onClick={async () => {
+              try {
+                await api('/auth/logout', 'POST');
+                setUser(null);
+                setWorkspace(null);
+                setCsrf('');
+                setPage('Overview');
+              } catch (e) {
+                onError((e as Error).message);
+              }
+            }}
+          >
+            <LogOut size={17} />
+            Sign out
+          </button>
         </div>
       </aside>
       <div className="app-body">

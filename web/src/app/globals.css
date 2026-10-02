@@ -872,8 +872,21 @@ td > small {
   padding: 31px 18px 0;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
-.sidebar > .brand {
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+.sidebar-content > * {
+  flex-shrink: 0;
+}
+.sidebar-content > .brand {
   font-size: 20px;
   color: #f0f3e9;
   padding-left: 6px;
@@ -933,6 +946,7 @@ td > small {
   display: flex;
   flex-direction: column;
   gap: 5px;
+  margin-bottom: auto;
 }
 .sidebar nav button {
   border: 0;
@@ -964,7 +978,26 @@ td > small {
   margin-left: auto;
 }
 .sidebar-bottom {
-  margin-top: auto;
+  flex-shrink: 0;
+  border-top: 1px solid #6379543b;
+  padding: 12px 0 max(16px, env(safe-area-inset-bottom));
+}
+.sidebar-signout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid #637954;
+  border-radius: 7px;
+  background: #ffffff08;
+  color: #e1ecc9;
+  font-size: 12px;
+  font-weight: 500;
+}
+.sidebar-signout:hover {
+  background: #c8d8a820;
 }
 .sidebar-note {
   border: 1px solid #66855f36;
@@ -993,8 +1026,7 @@ td > small {
   display: flex;
   align-items: center;
   gap: 9px;
-  padding: 18px 0;
-  border-top: 1px solid #6379543b;
+  padding: 0 0 12px;
 }
 .user-avatar {
   height: 29px;
@@ -1454,7 +1486,7 @@ td > small {
   .app-body {
     margin-left: 190px;
   }
-  .sidebar > .brand {
+  .sidebar-content > .brand {
     font-size: 18px;
     gap: 7px;
   }
