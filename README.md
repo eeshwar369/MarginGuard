@@ -1,74 +1,63 @@
 # MarginGuard
 
-**Investigate margin changes. Stress-test the next move. Approve the exact evidence.**
+### Turn margin questions into decisions you can defend.
 
-Built by **Genztech** for **PS-04: AI Decision Engine for Business Data**. Team leader and member: **Baleeshwar Palavadi** · [LinkedIn](https://www.linkedin.com/in/eeshwar369/).
+[![Product checks](https://github.com/eeshwar369/MarginGuard/actions/workflows/ci.yml/badge.svg)](https://github.com/eeshwar369/MarginGuard/actions/workflows/ci.yml)
 
-MarginGuard is a working single-instance product for a small retail operator who needs to explain contribution-margin erosion and compare possible actions. It turns orders, refunds, and fulfilment costs into an inspectable ledger, evidence-linked investigations, sensitivity analyses, and versioned decision memos.
+MarginGuard is an evidence-backed AI decision engine for retail profitability. It reconciles orders, refunds, and fulfilment costs, investigates margin erosion, and helps operators compare actions before approving a decision. Every finding connects to the records, calculations, and assumptions behind it.
 
-**[Open the live product](https://marginguard-genztech.onrender.com)** · [Source repository](https://github.com/eeshwar369/MarginGuard)
+**[Launch MarginGuard →](https://marginguard-genztech.onrender.com)** · [Product walkthrough](#try-the-complete-workflow) · [Architecture](docs/ARCHITECTURE.md) · [Verification evidence](docs/VERIFICATION.md)
 
-The public service runs on Render Free with durable Neon PostgreSQL storage. It can take around a minute to wake after inactivity.
+> The live app runs on Render Free with persistent Neon PostgreSQL storage. Its first load after inactivity can take around a minute. Choose **Explore the live workspace** for a private synthetic demo, or **Create your workspace** to register an account.
 
-![MarginGuard workspace](docs/images/overview.png)
+![MarginGuard dashboard showing contribution, margin drivers, and an accounting bridge](docs/images/overview.png)
 
-## Deploy with free persistent storage
+## From business data to an approved decision
 
-[Deploy on Render](https://render.com/deploy?repo=https://github.com/eeshwar369/MarginGuard) using the included Free blueprint and a separate [Neon Free PostgreSQL](https://console.neon.tech/signup) database. Set the private Neon connection string as `MG_DATABASE_URL` and the optional Gemini key as `MG_GEMINI_API_KEY` in Render. The app automatically uses its assigned HTTPS origin.
+In the synthetic sample, revenue rises **4.3%** while contribution falls **18.1%**. MarginGuard lets an operator inspect the causes, challenge an explanation, and see which action holds up when assumptions change.
 
-Accounts, datasets, checkpoints, and decisions stay in PostgreSQL across Render restarts. Free services have cold starts and usage quotas; this is not unlimited or always-on hosting. Follow the [deployment guide](docs/DEPLOYMENT.md) for setup and the persistence check. Local development defaults to SQLite when no database URL is set.
+| Capability | What the operator can do |
+|---|---|
+| **Reconciled business data** | Import three CSVs, inspect an exact financial ledger, quarantine duplicate refunds, and resolve missing costs or conflicting records before analysis. |
+| **Evidence-linked investigations** | Ask a business question, inspect a saved investigation, and distinguish supported, contradicted, and unresolved hypotheses. |
+| **Source-level traceability** | Follow a finding to its formula, SQL, source rows, and file fingerprints; correct a cost with a recorded reason and a new data version. |
+| **Decision stress-testing** | Compare discount changes, shipping savings, and the current policy across demand and return-cost bounds, implementation costs, break-even points, and downside outcomes. |
+| **Versioned approvals** | Review and approve a decision against exact inputs, export PDF or JSON, and retain the history when changed inputs make an approval stale. |
+| **Persistent private workspaces** | Keep accounts, datasets, investigations, and decisions in PostgreSQL across application restarts, with session protection, workspace isolation, and audit history. |
 
-## Try it locally
+### How AI fits into the workflow
 
-```sh
-uv sync --frozen
-cd web
-npm ci
-npm run build
-cd ..
-uv run uvicorn app.main:app --host 127.0.0.1 --port 8000
-```
+LangGraph coordinates **Validate → Plan → Investigate → Verify**, with persisted checkpoints for interrupted runs. With consent, Gemini selects bounded, typed analyses using the question and numerical summaries. DuckDB and exact monetary arithmetic calculate the results; the model does not generate executable SQL or financial values.
 
-Open **http://127.0.0.1:8000** and choose **Explore the live workspace**. The default development configuration allows this origin. Every visitor receives a separate demo account with clearly labeled synthetic data. No external AI key is needed to inspect and test the deterministic product flows.
+The interface identifies deterministic mode and provider-failure fallback explicitly. A real Gemini investigation has been verified on the deployed service; [the verification record](docs/VERIFICATION.md) separates live-provider evidence from deterministic and mocked-provider checks.
 
-For AI planning, copy `.env.example` to `.env`, set `MG_GEMINI_API_KEY` locally, and restart the service. Consent is required before sending a question and numerical summaries to Gemini. Without a key, the interface explicitly identifies verified deterministic analysis. A real Gemini 3.5 Flash-Lite investigation completed on the public service, recorded 415 model tokens, and correctly contradicted the sample discount hypothesis. All three browser journeys also passed against the public deployment. See the [verification record](docs/VERIFICATION.md).
+## Try the complete workflow
 
-## What is implemented
-
-- **Data reconciliation:** matched CSV imports, strict money/date/key validation, pre-aggregated refunds, duplicate quarantine, blocking errors, immutable dataset versions, and source hashes.
-- **Investigations:** a four-stage LangGraph workflow, typed bounded Gemini tool selection when configured, supported/contradicted/unresolved results, deterministic verification, execution traces, and restart recovery from saved checkpoints.
-- **Evidence explorer:** exact formulas and SQL, literal search, pagination, source-row references, raw normalized CSV exports, and cost corrections with a reason and optimistic concurrency checks.
-- **Decision lab:** discount and shipping alternatives, explicit demand/return-cost bounds, implementation costs, a continuous break-even approximation, whole-order scenario totals, and recommendations based on downside contribution.
-- **Decision records:** human acknowledgement and approval tied to data and scenario hashes; stale approvals after input changes; retained approval history; PDF and JSON exports.
-- **Product controls:** private accounts, scrypt passwords, HTTP-only sessions, CSRF and origin protection, resource isolation, request/import limits, persistent rate limits, production CSP, audit events, and responsive layouts.
-
-## Judge walkthrough
-
-1. Open the sample. September revenue rises **4.3%** while contribution margin falls **18.1%**.
-2. Inspect **Discounts increased**. Follow the formula and source rows instead of accepting a narrative on trust.
-3. Ask **“Did discounts decrease?”**. The numerical evidence contradicts that hypothesis.
+1. [Open the live app](https://marginguard-genztech.onrender.com) and select **Explore the live workspace**. Each visitor receives a separate demo workspace.
+2. Inspect **Discounts increased** from Overview. Follow the formula and source rows.
+3. Open Investigations and ask **“Did discounts decrease?”**. Consent to AI planning, or turn it off to use deterministic mode. The sample evidence contradicts the hypothesis.
 4. In Decision lab, change maximum extra return cost per order from **₹4 to ₹20**. The recommendation changes from shipping savings to keeping the current policy.
-5. Restore ₹4, create a memo, review assumptions, approve, and download its PDF.
-6. Correct a cost in Evidence explorer. The data version changes and the old memo becomes **stale**.
-7. Load the quality challenge. An identical refund is quarantined; investigations and scenarios remain blocked until acknowledgement.
+5. Restore ₹4, create a memo, review its assumptions, approve, and download the PDF.
+6. Correct a cost in Evidence explorer. The data version changes and the earlier memo becomes **stale** while its history remains available.
+7. In Data sources, load the quality challenge. A duplicate refund is quarantined; investigations and scenarios remain blocked until acknowledgement.
 
-All sample business numbers are synthetic. No customer adoption, realized savings, causal demand estimate, or calibrated model confidence is claimed.
+Demo accounts are temporary. Register through **Create your workspace** to retain your own workspace. **Sign out** stays at the bottom of the navigation sidebar; on mobile, open the menu first.
 
-## Verification
+All sample business data is synthetic. Scenario outcomes depend on explicit assumptions and do not establish realized savings or causal demand effects.
 
-```sh
-uv run ruff check app tests scripts
-uv run pytest -q
-uv run python -m scripts.benchmark
-cd web
-npm run build
-npx playwright install chromium
-npm run test:e2e
-```
+## Verified behavior
 
-The browser tests expect a running app at port 8000. On Windows, `MG_BROWSER_PATH` may point to an installed Chrome executable. See [verification results](docs/VERIFICATION.md) for measured results and limits. The [CI workflow](.github/workflows/ci.yml) builds the frontend, tests the backend, starts the server, and exercises the browser journeys.
+| Check | Observed result |
+|---|---|
+| Backend contracts | The same **54 tests passed on SQLite and PostgreSQL 17**. |
+| Complete browser workflows | **Three Playwright journeys passed against the public deployment**, including evidence, approvals, corrections, quality gates, and mobile navigation. |
+| Live AI integration | A Gemini investigation completed in AI mode and correctly contradicted the sample discount hypothesis. |
+| Durable storage | A registered account, dataset, and approved memo survived application redeployment; PDF export remained available. |
+| Automated accessibility | No violations detected on the three scanned screens. |
 
-## Architecture and deployment
+See [verification results and their limits](docs/VERIFICATION.md) and [portable evidence](docs/verification/). The [CI workflow](.github/workflows/ci.yml) builds the frontend, checks the backend against both databases, exercises browser journeys, and runs accessibility checks. These are functional checks, not a claim of unlimited capacity or an independent security certification.
+
+## Architecture
 
 | Layer | Technology | Responsibility |
 |---|---|---|
@@ -81,6 +70,48 @@ The browser tests expect a running app at port 8000. On Windows, `MG_BROWSER_PAT
 | Reports | ReportLab | Downloadable decision PDF |
 | Verification | pytest, Playwright, Ruff, TypeScript | Financial, security, workflow, and browser checks |
 
-Read the [architecture](docs/ARCHITECTURE.md), [deployment guide](docs/DEPLOYMENT.md), and [CSV contract](docs/CSV_CONTRACT.md). The Dockerfile, Compose file, Render blueprint, and backup utility are included. The public Render service is deployed with Neon PostgreSQL and private provider credentials. Use one application process; cloud state belongs in PostgreSQL, and local SQLite requires a persistent volume. Horizontal scaling, SSO, separate approver roles, password reset, and external store connectors are outside this release.
+The static frontend and FastAPI API run as one Docker service. Controls include scrypt password hashing, HttpOnly sessions, CSRF and origin protection, workspace isolation, production CSP, bounded uploads and job queues, rate limits, and transactional approval checks. Read the [architecture guide](docs/ARCHITECTURE.md) for the data model and recovery behavior.
 
-The final project presentation and demo materials are prepared separately in the workspace's `deliverables` directory. The submission must include this repository, the actual deployed Render URL, and an accessible demo-video URL after their access checks.
+## Run locally
+
+Use Python 3.12, Node.js 22, and [uv](https://docs.astral.sh/uv/). Dependencies are locked in `uv.lock` and `web/package-lock.json`.
+
+```sh
+uv sync --frozen
+cd web
+npm ci
+npm run build
+cd ..
+uv run uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+
+Open **http://127.0.0.1:8000**. Local development defaults to SQLite, and the deterministic workflows need no AI key. To enable Gemini, create a local `.env` from [`.env.example`](.env.example), set `MG_GEMINI_API_KEY`, and restart. Keep credentials out of Git.
+
+### Run the checks
+
+```sh
+uv run ruff check app tests scripts
+uv run pytest -q
+uv run python -m scripts.benchmark
+cd web
+npx playwright install chromium
+npm run test:e2e
+```
+
+Browser checks require a built frontend and running app. Use `MG_TEST_URL` to select another deployment and `MG_BROWSER_PATH` to select an installed Chrome executable. [Verification documentation](docs/VERIFICATION.md) explains the fixtures, measurements, and PostgreSQL checks.
+
+## Deploy with persistent storage
+
+[Deploy on Render](https://render.com/deploy?repo=https://github.com/eeshwar369/MarginGuard) using the included Free blueprint and a separate [Neon PostgreSQL](https://console.neon.tech/signup) database. Set `MG_DATABASE_URL` and, for AI planning, `MG_GEMINI_API_KEY` in Render's private environment. The app uses its assigned HTTPS origin automatically.
+
+PostgreSQL keeps accounts, datasets, checkpoints, and decisions across Render restarts. Free hosting has cold starts and usage quotas. The [deployment guide](docs/DEPLOYMENT.md) covers configuration, persistence checks, and operational limits; the [CSV contract](docs/CSV_CONTRACT.md) documents imports.
+
+The supported deployment uses one application process. Horizontal scaling, SSO, separate approver roles, password reset, and direct store integrations are outside this release.
+
+## Built by Genztech
+
+Created for **Build Fast with AI: AI Build Challenge 2026**, addressing **PS-04: AI Decision Engine for Business Data**.
+
+**Baleeshwar Palavadi** — team leader and member · [LinkedIn](https://www.linkedin.com/in/eeshwar369/)
+
+**[Try MarginGuard live](https://marginguard-genztech.onrender.com)** · [Explore the source](https://github.com/eeshwar369/MarginGuard)
